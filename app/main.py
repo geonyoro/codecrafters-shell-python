@@ -69,13 +69,13 @@ def main():
                 )
             except FileNotFoundError:
                 print(f"{command}: command not found")
-            else:
-                err = p.stderr
-                out = p.stdout
-                if err:
-                    print(err.decode())
-                else:
-                    print(out.decode())
+            # else:
+            #     err = p.stderr
+            #     out = p.stdout
+            #     if err:
+            #         print(err.decode())
+            #     else:
+            #         print(out.decode())
 
 
 if __name__ == "__main__":
