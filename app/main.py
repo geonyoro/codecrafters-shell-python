@@ -76,7 +76,7 @@ def main():
                     print("ERROR")
                     print(err.decode())
                 elif out:
-                    print(out.decode())
+                    print(out.decode().strip())
                     print("Past out")
 
 
