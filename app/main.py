@@ -73,11 +73,9 @@ def main():
                 err = p.stderr
                 out = p.stdout
                 if err:
-                    print("ERROR")
-                    print(err.decode())
+                    print(err.decode().strip())
                 elif out:
                     print(out.decode().strip())
-                    print("Past out")
 
 
 if __name__ == "__main__":
