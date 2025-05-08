@@ -11,6 +11,8 @@ def cmd_type(mobj: re.Match, environs: dict[str, typing.Any]):
         return
 
     for path in paths:
+        if not os.path.exists(path):
+            continue
         for name in os.listdir(path):
             if name == prog_name:
                 fullpath = os.path.join(path, name)
