@@ -76,8 +76,8 @@ def main():
                     print("ERROR")
                     print(err.decode())
                 elif out:
-                    print("OUT")
                     print(out.decode())
+                    print("Past out")
 
 
 if __name__ == "__main__":
