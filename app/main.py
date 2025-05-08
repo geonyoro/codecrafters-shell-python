@@ -2,7 +2,7 @@ import re
 import sys
 import typing
 
-import commands
+from app import commands
 
 
 class Prog:
