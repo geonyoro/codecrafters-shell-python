@@ -57,7 +57,8 @@ def main():
                 break
 
         if not found_prog:
-            print(f"{command}: command not found")
+            os.system(command)
+            # print(f"{command}: command not found")
 
 
 if __name__ == "__main__":
