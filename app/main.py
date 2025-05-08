@@ -7,9 +7,14 @@ def main():
         sys.stdout.write("$ ")
         # Wait for user input
         command = input()
-        mobj = re.match(r"exit (\d+)", command)
-        if mobj:
-            sys.exit(int(mobj[1]))
+        m_exit = re.match(r"exit (\d+)", command)
+        if m_exit:
+            sys.exit(int(m_exit[1]))
+        m_echo = re.match(r"echo (.*)", command)
+        if m_echo:
+            print(m_echo[1])
+            continue
+
         print(f"{command}: command not found")
 
 
