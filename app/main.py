@@ -1,5 +1,7 @@
 import os
 import re
+import shlex
+import subprocess
 import sys
 import typing
 
@@ -57,8 +59,21 @@ def main():
                 break
 
         if not found_prog:
-            os.system(command)
-            # print(f"{command}: command not found")
+            try:
+                p = subprocess.run(
+                    command.split(),
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+            except FileNotFoundError:
+                print(f"{command}: command not found")
+            else:
+                err = p.stderr
+                out = p.stdout
+                if err:
+                    print(err.decode())
+                else:
+                    print(out.decode())
 
 
 if __name__ == "__main__":
