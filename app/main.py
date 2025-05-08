@@ -1,5 +1,42 @@
 import re
 import sys
+import typing
+
+import commands
+
+
+class Prog:
+    def __init__(
+        self,
+        name,
+        _regexp,
+        runfunc: typing.Callable[[re.Match, dict[str, typing.Any]], None],
+    ):
+        self._name = name
+        self._regexp = _regexp
+        self._runfunc = runfunc
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def regexp(self) -> str:
+        return self._regexp
+
+    def run(self, match: re.Match, environ: dict):
+        return self._runfunc(match, environ)
+
+
+progs = (
+    Prog("exit", r"exit (\d+)", lambda mobj, _: sys.exit(int(mobj[1]))),
+    Prog("echo", r"echo (.*)", lambda mobj, _: print(mobj[1])),
+    Prog("type", r"type (.*)", commands.cmd_type),
+)
+
+known_commands = [i.name for i in progs]
+
+environ = {"known_commands": known_commands}
 
 
 def main():
@@ -7,15 +44,16 @@ def main():
         sys.stdout.write("$ ")
         # Wait for user input
         command = input()
-        m_exit = re.match(r"exit (\d+)", command)
-        if m_exit:
-            sys.exit(int(m_exit[1]))
-        m_echo = re.match(r"echo (.*)", command)
-        if m_echo:
-            print(m_echo[1])
-            continue
+        found_prog = False
+        for prog in progs:
+            mobj = re.match(prog.regexp, command)
+            if mobj:
+                prog.run(mobj, environ)
+                found_prog = True
+                break
 
-        print(f"{command}: command not found")
+        if not found_prog:
+            print(f"{command}: command not found")
 
 
 if __name__ == "__main__":
