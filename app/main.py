@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 import typing
@@ -36,7 +37,10 @@ progs = (
 
 known_commands = [i.name for i in progs]
 
-environ = {"known_commands": known_commands}
+environ = {
+    "known_commands": known_commands,
+    "PATH": os.getenv("PATH", ""),
+}
 
 
 def main():
