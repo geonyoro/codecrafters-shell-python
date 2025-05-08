@@ -59,11 +59,13 @@ def main():
                 break
 
         if not found_prog:
+            args = command.split()
             try:
                 p = subprocess.run(
-                    command.split(),
+                    args,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
+                    # env=environ,
                 )
             except FileNotFoundError:
                 print(f"{command}: command not found")
