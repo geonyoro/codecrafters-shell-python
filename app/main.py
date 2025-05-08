@@ -73,8 +73,10 @@ def main():
                 err = p.stderr
                 out = p.stdout
                 if err:
+                    print("ERROR")
                     print(err.decode())
                 elif out:
+                    print("OUT")
                     print(out.decode())
 
 
