@@ -24,8 +24,8 @@ def cmd_type(mobj: re.Match, environs: dict[str, typing.Any]):
 
 def cmd_echo(mobj: re.Match, _):
     text = mobj[1]
-    if text.startswith("'"):
-        text = text[1:]
-    if text.endswith("'"):
-        text = text[:-1]
+    if text.startswith("'") and text.endswith("'"):
+        text = text[1:-1]
+    else:
+        text = re.sub(r"\s{2,}", " ", text).strip()
     print(text)
