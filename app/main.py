@@ -59,7 +59,7 @@ def main():
                 break
 
         if not found_prog:
-            args = command.split()
+            args = shlex.split(command)
             try:
                 p = subprocess.run(
                     args,
