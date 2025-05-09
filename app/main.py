@@ -33,7 +33,7 @@ class Prog:
 
 progs = (
     Prog("exit", r"exit (\d+)", lambda mobj, _: sys.exit(int(mobj[1]))),
-    Prog("echo", r"echo (.*)", lambda mobj, _: print(mobj[1])),
+    Prog("echo", r"echo ?(.+)", commands.cmd_echo),
     Prog("type", r"type (.*)", commands.cmd_type),
 )
 
