@@ -24,8 +24,28 @@ def cmd_type(mobj: re.Match, environs: dict[str, typing.Any]):
 
 def cmd_echo(mobj: re.Match, _):
     text = mobj[1]
-    if text.startswith("'") and text.endswith("'"):
-        text = text[1:-1]
-    else:
-        text = re.sub(r"\s{2,}", " ", text).strip()
-    print(text)
+    final_text = ""
+    in_quote = False
+    prev_char = ""
+    for c in text:
+        if c == "'":
+            in_quote = not in_quote
+        elif c != " ":
+            final_text += c
+        elif c == " ":
+            if in_quote:
+                # we don't care, just add it
+                final_text += c
+            else:
+                # not in a quote
+                if prev_char == " ":
+                    # we already added a space previously
+                    pass
+                else:
+                    final_text += c
+
+        else:  # c == " "
+            raise ValueError(f"New char {c=}")
+
+        prev_char = c
+    print(final_text)
