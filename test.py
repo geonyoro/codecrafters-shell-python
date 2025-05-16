@@ -38,13 +38,15 @@ out:echo shell      hello
 in:echo \'\"shell example\"\'
 out:echo '"shell example"'
 
+in:echo \n
+out:echo 
+
 in:echo "/tmp/bar/f\n39" "/tmp/bar/f\64" "/tmp/bar/f'\'56"
-out:echo /tmp/bar/f\n39 /tmp/bar/f\64 /tmp/bar/f'\'56
+out:echo /tmp/bar/f39 /tmp/bar/f\64 /tmp/bar/f'\'56
 """
         ins = []
         outs = []
         for line in test_cases.split("\n"):
-            line = line.strip()
             if not line:
                 continue
             verb, _, cmd = line.partition(":")

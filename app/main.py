@@ -28,18 +28,28 @@ def raise_uncaught(num, c, prev_char, previous_quote_char, final_text):
     )
 
 
+def is_quote(c: str) -> bool:
+    return c in ["'", '"']
+
+
+def is_backslash(c: str) -> bool:
+    return c == "\\"
+
+
 def cmd_cleaner(cmd: str, **kwargs) -> str:
     final_text = ""
     previous_quote_char = ""
     prev_char = ""
-    for c in cmd:
-        # if kwargs.get("test_index") == 10:
-        #     print(c)
-
-        if c in ["'", '"']:
-            # this is a quote character
-            if prev_char == "\\":
+    ix = -1
+    while True:
+        ix += 1
+        if ix == len(cmd):
+            break
+        c = cmd[ix]
+        if is_quote(c):
+            if is_backslash(prev_char):
                 final_text += c
+            # this is a quote character
             elif previous_quote_char == c or previous_quote_char == "":
                 # matches closing quote or we are starting a quote
                 if previous_quote_char == "":
@@ -49,10 +59,15 @@ def cmd_cleaner(cmd: str, **kwargs) -> str:
                     previous_quote_char = ""
             else:
                 final_text += c
-        elif c == "\\":
+        elif is_backslash(c):
+            # if the next character is a n, the skip these tokens
+            if ix + 1 < len(cmd) and cmd[ix + 1] == "n":
+                # just skip this new line
+                ix += 1
+                continue
             # either a backslash in a quote section (keep literal)
             # or a backslash after another one
-            if previous_quote_char or prev_char == "\\":
+            elif previous_quote_char or is_backslash(prev_char):
                 final_text += c
         elif c != " ":
             final_text += c
