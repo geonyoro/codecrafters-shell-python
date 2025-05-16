@@ -10,7 +10,7 @@ RUN_FUNC = typing.Callable[[str, dict[str, typing.Any]], None]
 
 progs: dict[str, RUN_FUNC] = {
     "exit": lambda mobj, _: sys.exit(int(mobj[1])),
-    "echo": commands.cmd_echo,
+    "echo": lambda args, _: commands.cmd_echo(cmd_cleaner(args), _),
     "type": commands.cmd_type,
 }
 
@@ -88,7 +88,7 @@ def main():
     while True:
         sys.stdout.write("$ ")
         # Wait for user input
-        command = cmd_cleaner(input())
+        command = input()
         prog, _, args = command.partition(" ")
         run_func = progs.get(prog)
         if run_func:
