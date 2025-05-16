@@ -35,7 +35,7 @@ def cmd_cleaner(cmd: str) -> str:
             else:
                 previous_quote_char = ""
         elif c == "\\":
-            if prev_char == "\\":
+            if previous_quote_char or prev_char == "\\":
                 final_text += c
         elif c != " ":
             final_text += c
