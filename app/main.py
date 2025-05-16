@@ -22,19 +22,33 @@ environ = {
 }
 
 
+def raise_uncaught(num, c, prev_char, previous_quote_char, final_text):
+    raise ValueError(
+        f"Uncaught: {num=}, {c=}, {prev_char=}, {previous_quote_char=}, {final_text=}"
+    )
+
+
 def cmd_cleaner(cmd: str) -> str:
     final_text = ""
     previous_quote_char = ""
     prev_char = ""
     for c in cmd:
-        # this is a quote character
-        if c in ["'", '"'] and (previous_quote_char == c or previous_quote_char == ""):
-            if previous_quote_char == "":
-                # we are starting a new quote
-                previous_quote_char = c
+        if c in ["'", '"']:
+            # this is a quote character
+            if prev_char == "\\":
+                final_text += c
+            elif previous_quote_char == c or previous_quote_char == "":
+                # matches closing quote or we are starting a quote
+                if previous_quote_char == "":
+                    # we are starting a new quote
+                    previous_quote_char = c
+                else:
+                    previous_quote_char = ""
             else:
-                previous_quote_char = ""
+                final_text += c
         elif c == "\\":
+            # either a backslash in a quote section (keep literal)
+            # or a backslash after another one
             if previous_quote_char or prev_char == "\\":
                 final_text += c
         elif c != " ":
@@ -43,8 +57,6 @@ def cmd_cleaner(cmd: str) -> str:
             if previous_quote_char:
                 # we are in a quote, we don't care, just add it
                 final_text += c
-            # elif prev_char == "\\":
-            #     final_text += c
             else:
                 # we not in a quote
                 if prev_char == " ":
@@ -52,9 +64,8 @@ def cmd_cleaner(cmd: str) -> str:
                     pass
                 else:
                     final_text += c
-
-        else:  # c == " "
-            raise ValueError(f"New char {c=}")
+        else:
+            raise_uncaught(2, c, prev_char, previous_quote_char, final_text)
 
         prev_char = c
     return final_text

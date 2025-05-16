@@ -17,7 +17,7 @@ class Tests(unittest.TestCase):
             r"echo \\x": r"echo \x",
             r"echo shell\ \ \ \ \ \ hello": "echo shell      hello",
             # meant to reflect echo \'\"shell example\"\'
-            "echo \\'\\\"shell example\\\"\\'": "echo '\\\"shell example\\\"'",
+            "echo \\'\\\"shell example\\\"\\'": "echo '\"shell example\"'",
         }.items():
             with self.subTest(input=input, output=output):
                 toutput = main.cmd_cleaner(input)
