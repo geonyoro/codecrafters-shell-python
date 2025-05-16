@@ -23,34 +23,4 @@ def cmd_type(args: str, environs: dict[str, typing.Any]):
 
 
 def cmd_echo(args: str, _):
-    text = args
-    final_text = ""
-    previous_quote_char = ""
-    prev_char = ""
-    for c in text:
-        if c in ["'", '"'] and (previous_quote_char == c or previous_quote_char == ""):
-            if previous_quote_char == "":
-                # we are starting a new quote
-                previous_quote_char = c
-            else:
-                previous_quote_char = ""
-        elif c != " ":
-            final_text += c
-        elif c == " ":
-            if previous_quote_char:
-                # we are in a quote, we don't care, just add it
-                final_text += c
-            else:
-                # we not in a quote
-                if prev_char == " ":
-                    # we already added a space previously
-                    pass
-                else:
-                    final_text += c
-
-        else:  # c == " "
-            raise ValueError(f"New char {c=}")
-
-        prev_char = c
-    print(repr(final_text))
-    print(final_text)
+    print(args)

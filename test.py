@@ -15,6 +15,7 @@ class Tests(unittest.TestCase):
             # r'echo "before\   after"': r"echo before\   after",
             r"echo world\ \ \ \ \ \ script": "echo world      script",
             r"echo \\x": r"echo \x",
+            r"echo shell\ \ \ \ \ \ hello": "echo shell      hello",
         }.items():
             with self.subTest(input=input, output=output):
                 toutput = main.cmd_cleaner(input)
