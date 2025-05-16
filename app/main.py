@@ -9,7 +9,7 @@ from app import commands
 RUN_FUNC = typing.Callable[[str, dict[str, typing.Any]], None]
 
 progs: dict[str, RUN_FUNC] = {
-    "exit": lambda mobj, _: sys.exit(int(mobj[1])),
+    "exit": lambda args, _: sys.exit(int(args)),
     "echo": lambda args, _: commands.cmd_echo(cmd_cleaner(args), _),
     "type": commands.cmd_type,
 }
