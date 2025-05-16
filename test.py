@@ -39,10 +39,13 @@ in:echo \'\"shell example\"\'
 out:echo '"shell example"'
 
 in:echo \n
-out:echo 
+out:echo n
+
+in:example\ntest
+out:examplentest
 
 in:echo "/tmp/bar/f\n39" "/tmp/bar/f\64" "/tmp/bar/f'\'56"
-out:echo /tmp/bar/f39 /tmp/bar/f\64 /tmp/bar/f'\'56
+out:echo /tmp/bar/f\n39 /tmp/bar/f\64 /tmp/bar/f'\'56
 """
         ins = []
         outs = []
