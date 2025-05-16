@@ -51,20 +51,15 @@ def cmd_cleaner(cmd: str, **kwargs) -> str:
                 final_text += c
             # this is a quote character
             elif previous_quote_char == c or previous_quote_char == "":
-                # matches closing quote or we are starting a quote
                 if previous_quote_char == "":
                     # we are starting a new quote
                     previous_quote_char = c
                 else:
+                    # matches closing quote, clear previous quote
                     previous_quote_char = ""
             else:
                 final_text += c
         elif is_backslash(c):
-            # if the next character is a n, the skip these tokens
-            # if ix + 1 < len(cmd) and cmd[ix + 1] == "n":
-            #     # just skip this new line
-            #     ix += 1
-            #     continue
             # either a backslash in a quote section (keep literal)
             # or a backslash after another one
             if previous_quote_char or is_backslash(prev_char):
