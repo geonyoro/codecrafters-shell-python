@@ -38,7 +38,7 @@ out:echo shell      hello
 in:echo \'\"shell example\"\'
 out:echo '"shell example"'
 
-in:"/tmp/bar/f\n39" "/tmp/bar/f\64" "/tmp/bar/f'\'56"
+in:echo "/tmp/bar/f\n39" "/tmp/bar/f\64" "/tmp/bar/f'\'56"
 out:echo /tmp/bar/f\n39 /tmp/bar/f\64 /tmp/bar/f'\'56
 """
         ins = []
@@ -56,7 +56,7 @@ out:echo /tmp/bar/f\n39 /tmp/bar/f\64 /tmp/bar/f'\'56
                 outs.append(cmd)
 
         assert len(ins) == len(outs)
-        for input, output in zip(ins, outs):
+        for index, (input, output) in enumerate(zip(ins, outs)):
             with self.subTest(input=input, output=output):
-                toutput = main.cmd_cleaner(input)
+                toutput = main.cmd_cleaner(input, test_index=index)
                 self.assertEqual(output, toutput)

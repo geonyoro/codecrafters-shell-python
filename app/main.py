@@ -28,11 +28,14 @@ def raise_uncaught(num, c, prev_char, previous_quote_char, final_text):
     )
 
 
-def cmd_cleaner(cmd: str) -> str:
+def cmd_cleaner(cmd: str, **kwargs) -> str:
     final_text = ""
     previous_quote_char = ""
     prev_char = ""
     for c in cmd:
+        # if kwargs.get("test_index") == 10:
+        #     print(c)
+
         if c in ["'", '"']:
             # this is a quote character
             if prev_char == "\\":
