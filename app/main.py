@@ -95,7 +95,12 @@ def cmd_cleaner(cmd: str, **kwargs) -> str:
             # not a space
             final_text += c
 
-        prev_char = c
+        if is_backslash(c) and is_backslash(prev_char):
+            # cannot overwrite the prev char, just preserve it
+            prev_char = ""
+        else:
+            prev_char = c
+
     return final_text
 
 

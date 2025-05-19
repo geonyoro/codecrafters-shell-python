@@ -53,8 +53,11 @@ out:echo hello'script'\n'world
 in:echo "hello\"insidequotes"script\"
 out:echo hello"insidequotesscript"
 
-# in:echo "hello'script'\\n'world"
-# out:echo "hello'script'\\n'world"
+in:echo "hello'script'\\n'world"
+out:echo hello'script'\n'world
+
+in:echo "mixed\"quote'world'\\"
+out:echo mixed"quote'world'\
 """
         ins = []
         outs = []
