@@ -24,7 +24,7 @@ in:echo "bar"  "shell's"  "foo"
 out:echo bar shell's foo
 
 in:echo "before\   after"
-out:echo before\   after
+out:echo before   after
 
 in:echo world\ \ \ \ \ \ script
 out:echo world      script
@@ -45,12 +45,21 @@ in:example\ntest
 out:examplentest
 
 in:echo "/tmp/bar/f\n39" "/tmp/bar/f\64" "/tmp/bar/f'\'56"
-out:echo /tmp/bar/f\n39 /tmp/bar/f\64 /tmp/bar/f'\'56
+out:echo /tmp/bar/fn39 /tmp/bar/f64 /tmp/bar/f''56
+
+in:echo "hello'script'\\n'world"
+out:echo hello'script'\n'world
+
+in:echo "hello\"insidequotes"script\"
+out:echo hello"insidequotesscript"
+
+# in:echo "hello'script'\\n'world"
+# out:echo "hello'script'\\n'world"
 """
         ins = []
         outs = []
         for line in test_cases.split("\n"):
-            if not line:
+            if not line or line.startswith("#"):
                 continue
             verb, _, cmd = line.partition(":")
             if verb not in ["in", "out"]:

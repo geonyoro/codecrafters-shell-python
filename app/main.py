@@ -36,14 +36,19 @@ def is_backslash(c: str) -> bool:
     return c == "\\"
 
 
+def is_space(c: str) -> bool:
+    return c == " "
+
+
 def cmd_cleaner(cmd: str, **kwargs) -> str:
     final_text = ""
     previous_quote_char = ""
     prev_char = ""
+    cmd_size = len(cmd)
     ix = -1
     while True:
         ix += 1
-        if ix == len(cmd):
+        if ix == cmd_size:
             break
         c = cmd[ix]
         if is_quote(c):
@@ -62,11 +67,11 @@ def cmd_cleaner(cmd: str, **kwargs) -> str:
         elif is_backslash(c):
             # either a backslash in a quote section (keep literal)
             # or a backslash after another one
-            if previous_quote_char or is_backslash(prev_char):
+            if previous_quote_char == "'":
                 final_text += c
-        elif c != " ":
-            final_text += c
-        elif c == " ":
+            elif is_backslash(prev_char):
+                final_text += c
+        elif is_space(c):
             if previous_quote_char:
                 # we are in a quote, we don't care, just add it
                 final_text += c
@@ -78,7 +83,17 @@ def cmd_cleaner(cmd: str, **kwargs) -> str:
                 else:
                     final_text += c
         else:
-            raise_uncaught(2, c, prev_char, previous_quote_char, final_text)
+            # if is_backslash(prev_char) and previous_quote_char == '"':
+            #     # we are in a double quote
+            #     # backslashes followed by these characters are removed
+            #     if c in ("$", "`", '"'):
+            #         pass
+            #     else:
+            #         # reinsert the prev char
+            #         final_text += "\\"
+
+            # not a space
+            final_text += c
 
         prev_char = c
     return final_text
