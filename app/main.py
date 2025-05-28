@@ -40,6 +40,50 @@ def is_space(c: str) -> bool:
     return c == " "
 
 
+def parser_v2(input: str) -> list[str]:
+    cmds = []
+    ix = -1
+    cur_arg = ""
+    try:
+        while True:
+            ix += 1
+            # print(ix, input[ix])
+            if input[ix] == "'":
+                # consume single quotes
+                ix += 1
+                arg = ""
+                while input[ix] != "'":
+                    arg += input[ix]
+                cmds.append(arg)
+            elif input[ix] == '"':
+                # consume double quotes
+                ix += 1
+                arg = ""
+                while input[ix] != '"':
+                    if input[ix] == "\\":
+                        ix += 1
+                        # backslash
+                        if input[ix] in '$`\\"':
+                            arg += input[ix]
+                        else:
+                            arg += "\\"  # readd the skipped backlash
+                            arg += input[ix]
+            elif input[ix] == "\\":
+                ix += 1
+                cmds.append(input[ix])
+            elif input[ix] == " ":
+                if cur_arg:
+                    cmds.append(cur_arg)
+                    cur_arg = ""
+            else:
+                cur_arg += input[ix]
+    except IndexError:
+        if cur_arg:
+            cmds.append(cur_arg)
+
+    return cmds
+
+
 def cmd_cleaner(cmd: str, **kwargs) -> str:
     final_text = ""
     previous_quote_char = ""
