@@ -24,7 +24,7 @@ def parse_ins_and_outs(test_cases: str) -> tuple[list, list]:
 
 
 class Tests(unittest.TestCase):
-    def _test_cmd_cleaner(self):
+    def test_cmd_cleaner(self):
         test_cases = r"""
 in:echo hello   world
 out:echo hello world
@@ -87,9 +87,42 @@ out:echo mixed"quote'world'\
         test_cases = r"""
 in:echo hello   world
 out:['echo', 'hello', 'world']
+in:echo 'shell hello'
+out:['echo', 'shell hello']
+in:echo 'world     test'
+out:['echo', 'world     test']
+in:echo "quz  hello"  "bar"
+out:['echo', 'quz  hello', 'bar']
+in:echo "bar"  "shell's"  "foo"
+out:['echo', 'bar', "shell's", 'foo']
+in:echo "before\   after"
+out:['echo', 'before\\   after']
+in:echo world\ \ \ \ \ \ script
+out:['echo', 'world      script']
+in:echo \\x
+out:['echo', '\\x']
+in:echo shell\ \ \ \ \ \ hello
+out:['echo', 'shell      hello']
+in:echo \'\"shell example\"\'
+out:['echo', '\'"shell', 'example"\'']
+in:echo \n
+out:['echo', 'n']
+in:example\ntest
+out:['examplentest']
+in:echo "/tmp/bar/f\n39" "/tmp/bar/f\64" "/tmp/bar/f'\'56"
+out:['echo', '/tmp/bar/f\\n39', '/tmp/bar/f\\64', "/tmp/bar/f'\\'56"]
+in:echo "hello'script'\\n'world"
+out:['echo', "hello'script'\\n'world"]
+in:echo "hello\"insidequotes"script\"
+out:['echo', 'hello"insidequotesscript"']
+in:echo "hello'script'\\n'world"
+out:['echo', "hello'script'\\n'world"]
+in:echo "mixed\"quote'world'\\"
+out:['echo', 'mixed"quote\'world\'\\']
 """
         ins, outs = parse_ins_and_outs(test_cases)
         for input, raw_out in zip(ins, outs):
+            print(input)
             output = eval(raw_out)
             pout = main.parser_v2(input)
             self.assertEqual(output, pout)

@@ -10,7 +10,7 @@ RUN_FUNC = typing.Callable[[str, dict[str, typing.Any]], None]
 
 progs: dict[str, RUN_FUNC] = {
     "exit": lambda args, _: sys.exit(int(args)),
-    "echo": lambda args, _: commands.cmd_echo(cmd_cleaner(args), _),
+    "echo": lambda args, _: commands.cmd_echo(parser_v2(args), _),
     "type": commands.cmd_type,
 }
 
@@ -42,41 +42,47 @@ def is_space(c: str) -> bool:
 
 def parser_v2(input: str) -> list[str]:
     cmds = []
-    ix = -1
+    ix = 0
     cur_arg = ""
     try:
         while True:
-            ix += 1
-            # print(ix, input[ix])
+            print(ix, input[ix], repr(cur_arg), cmds)
             if input[ix] == "'":
                 # consume single quotes
                 ix += 1
-                arg = ""
                 while input[ix] != "'":
-                    arg += input[ix]
-                cmds.append(arg)
+                    cur_arg += input[ix]
+                    ix += 1
+                ix += 1
             elif input[ix] == '"':
                 # consume double quotes
                 ix += 1
-                arg = ""
                 while input[ix] != '"':
                     if input[ix] == "\\":
                         ix += 1
                         # backslash
                         if input[ix] in '$`\\"':
-                            arg += input[ix]
+                            cur_arg += input[ix]
                         else:
-                            arg += "\\"  # readd the skipped backlash
-                            arg += input[ix]
+                            cur_arg += "\\"  # readd the skipped backlash
+                            cur_arg += input[ix]
+                    else:
+                        cur_arg += input[ix]
+                    ix += 1
+                ix += 1
             elif input[ix] == "\\":
                 ix += 1
-                cmds.append(input[ix])
+                cur_arg += input[ix]
+                ix += 1
             elif input[ix] == " ":
                 if cur_arg:
                     cmds.append(cur_arg)
                     cur_arg = ""
+                while input[ix] == " ":
+                    ix += 1
             else:
                 cur_arg += input[ix]
+                ix += 1
     except IndexError:
         if cur_arg:
             cmds.append(cur_arg)

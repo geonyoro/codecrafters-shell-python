@@ -21,5 +21,5 @@ def cmd_type(args: str, environs: dict[str, typing.Any]):
         print(f"{prog_name}: not found")
 
 
-def cmd_echo(args: str, _):
-    print(args)
+def cmd_echo(args: list[str], _):
+    print(" ".join(args))
