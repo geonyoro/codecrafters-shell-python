@@ -4,7 +4,7 @@ import subprocess
 import sys
 import typing
 
-from app import commands
+from app import commands, parsers
 
 RUN_FUNC = typing.Callable[[list[str], dict[str, typing.Any]], None]
 
@@ -40,125 +40,11 @@ def is_space(c: str) -> bool:
     return c == " "
 
 
-def parser_v2(input: str) -> list[str]:
-    cmds = []
-    ix = 0
-    cur_arg = ""
-    try:
-        while True:
-            # print(ix, input[ix], repr(cur_arg), cmds)
-            if input[ix] == "'":
-                # consume single quotes
-                ix += 1
-                while input[ix] != "'":
-                    cur_arg += input[ix]
-                    ix += 1
-                ix += 1
-            elif input[ix] == '"':
-                # consume double quotes
-                ix += 1
-                while input[ix] != '"':
-                    if input[ix] == "\\":
-                        ix += 1
-                        # backslash
-                        if input[ix] in '$`\\"':
-                            cur_arg += input[ix]
-                        else:
-                            cur_arg += "\\"  # readd the skipped backlash
-                            cur_arg += input[ix]
-                    else:
-                        cur_arg += input[ix]
-                    ix += 1
-                ix += 1
-            elif input[ix] == "\\":
-                ix += 1
-                cur_arg += input[ix]
-                ix += 1
-            elif input[ix] == " ":
-                if cur_arg:
-                    cmds.append(cur_arg)
-                    cur_arg = ""
-                while input[ix] == " ":
-                    ix += 1
-            else:
-                cur_arg += input[ix]
-                ix += 1
-    except IndexError:
-        if cur_arg:
-            cmds.append(cur_arg)
-
-    return cmds
-
-
-def cmd_cleaner(cmd: str, **kwargs) -> str:
-    final_text = ""
-    previous_quote_char = ""
-    prev_char = ""
-    cmd_size = len(cmd)
-    ix = -1
-    while True:
-        ix += 1
-        if ix == cmd_size:
-            break
-        c = cmd[ix]
-        if is_quote(c):
-            if is_backslash(prev_char):
-                final_text += c
-            # this is a quote character
-            elif previous_quote_char == c or previous_quote_char == "":
-                if previous_quote_char == "":
-                    # we are starting a new quote
-                    previous_quote_char = c
-                else:
-                    # matches closing quote, clear previous quote
-                    previous_quote_char = ""
-            else:
-                final_text += c
-        elif is_backslash(c):
-            # either a backslash in a quote section (keep literal)
-            # or a backslash after another one
-            if previous_quote_char == "'":
-                final_text += c
-            elif is_backslash(prev_char):
-                final_text += c
-        elif is_space(c):
-            if previous_quote_char:
-                # we are in a quote, we don't care, just add it
-                final_text += c
-            else:
-                # we not in a quote
-                if prev_char == " ":
-                    # we already added a space previously
-                    pass
-                else:
-                    final_text += c
-        else:
-            # if is_backslash(prev_char) and previous_quote_char == '"':
-            #     # we are in a double quote
-            #     # backslashes followed by these characters are removed
-            #     if c in ("$", "`", '"'):
-            #         pass
-            #     else:
-            #         # reinsert the prev char
-            #         final_text += "\\"
-
-            # not a space
-            final_text += c
-
-        if is_backslash(c) and is_backslash(prev_char):
-            # cannot overwrite the prev char, just preserve it
-            prev_char = ""
-        else:
-            prev_char = c
-
-    return final_text
-
-
 def main():
     while True:
         sys.stdout.write("$ ")
         # Wait for user input
-        args = parser_v2(input())
+        args = parsers.parser(input())
         prog = args[0]
         run_func = progs.get(prog)
         if run_func:
