@@ -2,9 +2,10 @@ import os
 import typing
 
 
-def cmd_type(args: str, environs: dict[str, typing.Any]):
+def cmd_type(args: list[str], environs: dict[str, typing.Any]):
     paths = environs.get("PATH", "").split(":")
-    for prog_name in args.split():
+    for prog_name in args[1:]:
+        prog_name = prog_name.strip()
         if prog_name in environs.get("known_commands", []):
             print(f"{prog_name} is a shell builtin")
             return

@@ -6,11 +6,11 @@ import typing
 
 from app import commands
 
-RUN_FUNC = typing.Callable[[str, dict[str, typing.Any]], None]
+RUN_FUNC = typing.Callable[[list[str], dict[str, typing.Any]], None]
 
 progs: dict[str, RUN_FUNC] = {
-    "exit": lambda args, _: sys.exit(int(args)),
-    "echo": lambda args, _: commands.cmd_echo(parser_v2(args), _),
+    "exit": lambda args, _: sys.exit(int(args[1])),
+    "echo": lambda args, _: commands.cmd_echo(args[1:], _),
     "type": commands.cmd_type,
 }
 
@@ -158,14 +158,13 @@ def main():
     while True:
         sys.stdout.write("$ ")
         # Wait for user input
-        command = input()
-        prog, _, args = command.partition(" ")
+        args = parser_v2(input())
+        prog = args[0]
         run_func = progs.get(prog)
         if run_func:
             run_func(args, environ)
             continue
 
-        args = shlex.split(command)
         try:
             p = subprocess.run(
                 args,
@@ -174,7 +173,7 @@ def main():
                 # env=environ,
             )
         except FileNotFoundError:
-            print(f"{command}: command not found")
+            print(f"{args[0]}: command not found")
         else:
             err = p.stderr
             out = p.stdout
