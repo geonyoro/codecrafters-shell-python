@@ -73,8 +73,8 @@ def split_on_redirects(
                 ix += 1
                 hit_redirect = "stdout"
                 if inpt[ix] == ">":
-                    ix += 1
                     mode = "a"
+                    ix += 1
                 break
             elif inpt[ix] in "12":
                 ix += 1
