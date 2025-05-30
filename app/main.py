@@ -46,7 +46,7 @@ def parser_v2(input: str) -> list[str]:
     cur_arg = ""
     try:
         while True:
-            print(ix, input[ix], repr(cur_arg), cmds)
+            # print(ix, input[ix], repr(cur_arg), cmds)
             if input[ix] == "'":
                 # consume single quotes
                 ix += 1
