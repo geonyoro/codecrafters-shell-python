@@ -2,7 +2,7 @@ import os
 import typing
 
 
-def cmd_type(args: list[str], environs: dict[str, typing.Any]):
+def cmd_type(args: list[str], environs: dict[str, typing.Any], stdout, stderr):
     paths = environs.get("PATH", "").split(":")
     for prog_name in args[1:]:
         prog_name = prog_name.strip()
@@ -22,5 +22,6 @@ def cmd_type(args: list[str], environs: dict[str, typing.Any]):
         print(f"{prog_name}: not found")
 
 
-def cmd_echo(args: list[str], _):
-    print(" ".join(args))
+def cmd_echo(args: list[str], stdout, stderr):
+    stdout.write(" ".join(args))
+    stdout.write("\n")

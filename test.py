@@ -75,6 +75,18 @@ out:(("echo 1 "),("1","w"),None)
 
 in:echo 1>hello
 out:(("echo "),("hello","w"),None)
+
+in:echo 1> hello
+out:(("echo "),("hello","w"),None)
+
+in:echo > hello
+out:(("echo "),("hello","w"),None)
+
+in:echo 2> hello
+out:(("echo "),None,("hello","w"))
+
+in:echo > hello 2> goodbye
+out:(("echo "),("hello","w"),("goodbye","w"))
 """
         ins, outs = parse_ins_and_outs(test_cases)
         for input, raw_out in zip(ins, outs):

@@ -137,13 +137,33 @@ def split_on_redirects(
                         except IndexError:
                             # we hit the end. Re-add the missing 2 above
                             stdout_fname += "2"
+                    else:
+                        stdout_fname += inpt[ix]
 
-                    stdout_fname += inpt[ix]
                     ix += 1
                     if hit_redirect == "stderr":
                         break
 
                 # having consumed the non-spaces, skip and keep going till you hit the 2>
+                stdout = (stdout_fname, mode)
+                hit_redirect = ""
+                try:
+                    while True:
+                        if inpt[ix] == "2":
+                            ix += 1
+                            if inpt[ix] == ">":
+                                hit_redirect = "stderr"
+                                ix += 1
+                                if inpt[ix] == ">":
+                                    mode = "a"
+                                break
+                        else:
+                            # skip everything else
+                            ix += 1
+
+                except IndexError:
+                    # we ran till the end
+                    pass
             except IndexError:
                 pass
             stdout = (stdout_fname, mode)

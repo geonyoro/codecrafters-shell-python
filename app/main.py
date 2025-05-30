@@ -1,16 +1,27 @@
+import io
 import os
 import shlex
 import subprocess
 import sys
 import typing
+from io import FileIO
 
 from app import commands, parsers
 
-RUN_FUNC = typing.Callable[[list[str], dict[str, typing.Any]], None]
+RUN_FUNC = typing.Callable[
+    # args
+    [
+        list[str],  # cmd
+        dict[str, typing.Any],  # environ
+        io.FileIO,  # stdout
+        io.FileIO,  # stderr
+    ],  # cmd
+    None,
+]
 
 progs: dict[str, RUN_FUNC] = {
-    "exit": lambda args, _: sys.exit(int(args[1])),
-    "echo": lambda args, _: commands.cmd_echo(args[1:], _),
+    "exit": lambda cmd, *args, **kwargs: sys.exit(int(cmd[1])),
+    "echo": lambda args, _, stdout, stderr: commands.cmd_echo(args[1:], stdout, stderr),
     "type": commands.cmd_type,
 }
 
@@ -44,18 +55,29 @@ def main():
     while True:
         sys.stdout.write("$ ")
         # Wait for user input
-        args = parsers.parser(input())
+        cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(input())
+        if stdout_fname:
+            stdout = open(stdout_fname[0], mode=stdout_fname[1])
+        else:
+            stdout = sys.stdout
+
+        if stderr_fname:
+            stderr = open(stderr_fname[0], mode=stderr_fname[1])
+        else:
+            stderr = sys.stderr
+
+        args = parsers.parser(cmd)
         prog = args[0]
         run_func = progs.get(prog)
         if run_func:
-            run_func(args, environ)
+            run_func(args, environ, stdout, stderr)
             continue
 
         try:
             p = subprocess.run(
                 args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stdout=stdout,
+                stderr=stderr,
                 # env=environ,
             )
         except FileNotFoundError:
