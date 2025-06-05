@@ -54,6 +54,7 @@ def completer_func(text, state):
     matches = [i for i in progs if i.startswith(text)]
     if len(matches) == 1 and state == 0:
         return matches[0] + " "
+    print("\a")
     return None
 
 
