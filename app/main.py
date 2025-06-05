@@ -54,7 +54,7 @@ def completer_func(text, state):
     completes = ["echo", "exit"]
     matches = [i for i in completes if i.startswith(text)]
     if len(matches) == 1 and state == 0:
-        return matches[0]
+        return matches[0] + " "
     return None
 
 
