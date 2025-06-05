@@ -85,6 +85,9 @@ out:(("echo "),("hello","w"),None)
 in:echo x  x >> /tmp/hello
 out:(("echo x  x "),("/tmp/hello","a"),None)
 
+in:echo x  x 1>> /tmp/hello
+out:(("echo x  x "),("/tmp/hello","a"),None)
+
 in:echo 2> hello
 out:(("echo "),None,("hello","w"))
 

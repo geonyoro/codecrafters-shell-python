@@ -1,8 +1,3 @@
-import sys
-from dataclasses import dataclass
-from io import FileIO
-
-
 def parser(input: str) -> list[str]:
     cmds = []
     ix = 0
@@ -79,7 +74,7 @@ def split_on_redirects(
             elif inpt[ix] in "12":
                 ix += 1
                 if ix >= string_size:
-                    # we have consumed a random 1
+                    # we have hit the end of the stream, consumed a random 1, re-add it to the string
                     cmd += inpt[ix - 1]
                     break
                 else:
@@ -91,6 +86,7 @@ def split_on_redirects(
                         ix += 1
                         if inpt[ix] == ">":
                             mode = "a"
+                            ix += 1
                         break
                     else:
                         cmd += inpt[ix - 1]
