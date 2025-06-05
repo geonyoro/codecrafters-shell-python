@@ -1,10 +1,9 @@
 import io
 import os
-import shlex
+import readline
 import subprocess
 import sys
 import typing
-from io import FileIO
 
 from app import commands, parsers
 
@@ -51,7 +50,17 @@ def is_space(c: str) -> bool:
     return c == " "
 
 
+def completer_func(text, state):
+    completes = ["echo", "exit"]
+    matches = [i for i in completes if i.startswith(text)]
+    if len(matches) == 1 and state == 0:
+        return matches[0]
+    return None
+
+
 def main():
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(completer_func)
     while True:
         sys.stdout.write("$ ")
         # Wait for user input
