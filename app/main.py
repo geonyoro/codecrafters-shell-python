@@ -66,7 +66,7 @@ def is_space(c: str) -> bool:
     return c == " "
 
 
-print(get_path_prog_names())
+# print(get_path_prog_names())
 
 
 def completer_func(text, state):
