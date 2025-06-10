@@ -66,11 +66,11 @@ def is_space(c: str) -> bool:
     return c == " "
 
 
-# print(get_path_prog_names())
+print(get_path_prog_names())
 
 
 def completer_func(text, state):
-    source_list = list(progs.keys()) + list(get_path_prog_names())
+    source_list = set(list(progs.keys()) + list(get_path_prog_names()))
     matches = [i for i in source_list if i.startswith(text)]
     if len(matches) == 1 and state == 0:
         return matches[0] + " "
