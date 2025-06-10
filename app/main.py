@@ -4,6 +4,8 @@ import readline
 import subprocess
 import sys
 import typing
+from functools import lru_cache
+from os.path import isfile
 
 from app import commands, parsers
 
@@ -32,6 +34,20 @@ environ = {
 }
 
 
+@lru_cache
+def get_path_prog_names():
+    env_path = os.environ.get("PATH", "")
+    paths = set()
+    for dir in env_path.split(":"):
+        if not os.path.exists(dir):
+            continue
+        for path in os.listdir(dir):
+            full = os.path.join(dir, path)
+            if isfile(full) and os.access(full, os.X_OK):
+                paths.add(path)
+    return paths
+
+
 def raise_uncaught(num, c, prev_char, previous_quote_char, final_text):
     raise ValueError(
         f"Uncaught: {num=}, {c=}, {prev_char=}, {previous_quote_char=}, {final_text=}"
@@ -50,11 +66,15 @@ def is_space(c: str) -> bool:
     return c == " "
 
 
+# print(get_path_prog_names())
+
+
 def completer_func(text, state):
-    matches = [i for i in progs if i.startswith(text)]
+    source_list = list(progs.keys()) + list(get_path_prog_names())
+    matches = [i for i in source_list if i.startswith(text)]
     if len(matches) == 1 and state == 0:
         return matches[0] + " "
-    print("\a")
+    sys.stdout.write("\a")
     return None
 
 
