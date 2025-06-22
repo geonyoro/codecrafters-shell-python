@@ -37,6 +37,7 @@ environ = {
 @lru_cache
 def get_path_prog_names():
     env_path = os.environ.get("PATH", "")
+    # env_path = "/tmp/p:"
     paths = set()
     for dir in env_path.split(":"):
         if not os.path.exists(dir):
@@ -69,12 +70,23 @@ def is_space(c: str) -> bool:
 # print(get_path_prog_names())
 
 
+has_printed_bell = False
+
+
 def completer_func(text, state):
     source_list = set(list(progs.keys()) + list(get_path_prog_names()))
     matches = [i for i in source_list if i.startswith(text)]
     if state == 0:
-        return " ".join(matches)
-    sys.stdout.write("\a")
+        if len(matches) == 1:
+            return matches[0]
+        elif len(matches) > 1:
+            global has_printed_bell
+            if not has_printed_bell:
+                has_printed_bell = True
+                sys.stdout.write("\a")
+            else:
+                print("  ".join(matches))
+                print("$ ", end="")
     return None
 
 
