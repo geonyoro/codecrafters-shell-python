@@ -78,7 +78,7 @@ def completer_func(text, state):
     matches = [i for i in source_list if i.startswith(text)]
     if state == 0:
         if len(matches) == 1:
-            return matches[0]
+            return f"{matches[0]} "
         elif len(matches) > 1:
             global has_printed_bell
             if not has_printed_bell:
