@@ -87,7 +87,7 @@ def completer_func(text, state):
                 print()
             else:
                 print("  ".join(matches))
-                print("$ ", end="")
+                print(f"$ {text}", end="")
     return None
 
 
