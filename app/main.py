@@ -84,6 +84,7 @@ def completer_func(text, state):
             if not has_printed_bell:
                 has_printed_bell = True
                 sys.stdout.write("\a")
+                print(f"$ {text}", end="")
             else:
                 print("  ".join(matches))
                 print("$ ", end="")
