@@ -74,7 +74,7 @@ has_printed_bell = False
 
 
 def completer_func(text, state):
-    source_list = set(list(progs.keys()) + list(get_path_prog_names()))
+    source_list = sorted(set(list(progs.keys()) + list(get_path_prog_names())))
     matches = [i for i in source_list if i.startswith(text)]
     if state == 0:
         if len(matches) == 1:
