@@ -1,6 +1,7 @@
 import unittest
 
 from app import parsers
+from app.completion import get_common_base
 
 # line 1 is the input, line 2 is the output
 
@@ -100,3 +101,21 @@ out:(("echo "),("hello","w"),("goodbye","w"))
             with self.subTest(input=input, output=output):
                 pout = parsers.split_on_redirects(input)
                 self.assertEqual(output, pout)
+
+    def test_get_common_base(self):
+        progs = ["xyz_foo", "xyz_foo_bar", "xyz_foo_bar_baz"]
+        # for a wrong complet
+        with self.subTest("wrong completion, nothing is found"):
+            self.assertEqual("", get_common_base("a", progs))
+
+        with self.subTest("partial completion on xyz_foo"):
+            self.assertEqual("xyz_foo", get_common_base("x", progs))
+            self.assertEqual("xyz_foo", get_common_base("xyz", progs))
+            self.assertEqual("xyz_foo", get_common_base("xyz_", progs))
+            self.assertEqual("xyz_foo", get_common_base("xyz_foo", progs))
+
+        with self.subTest("partial completion on xyz_foo_bar"):
+            self.assertEqual("xyz_foo_bar", get_common_base("xyz_foo_b", progs))
+
+        with self.subTest("full completion"):
+            self.assertEqual("xyz_foo_bar_baz", get_common_base("xyz_foo_bar_b", progs))
