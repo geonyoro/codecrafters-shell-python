@@ -80,18 +80,17 @@ def completer_func(text, state):
   if state == 0:
     if common_base:
       return f"{common_base} "
-    # if len(matches) == 1:
-    #   return f"{matches[0]} "
+      # if len(matches) == 1:
+      #   return f"{matches[0]} "
     elif len(matches) > 1:
       global has_printed_bell
       if not has_printed_bell:
         has_printed_bell = True
         sys.stdout.write("\a")
         print()
-        else:
-
-        print("  ".join(matches))
-        print(f"$ {text}", end="")
+    else:
+      print("  ".join(matches))
+      print(f"$ {text}", end="")
     return None
 
 
