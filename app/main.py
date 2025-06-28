@@ -78,8 +78,10 @@ def completer_func(text, state):
     matches = [i for i in source_list if i.startswith(text)]
     base = completion.get_common_base(text, matches)
     if state == 0:
-        if base:
-            return f"{base} "
+        if len(matches) == 1:
+            return f"{matches[0]} "
+        elif base:
+            return f"{base}"
         elif len(matches) > 1:
             global has_printed_bell
             if not has_printed_bell:
