@@ -77,12 +77,14 @@ def completer_func(text, state):
     global has_printed_bell
     source_list = sorted(set(list(progs.keys()) + list(get_path_prog_names())))
     matches = [i for i in source_list if i.startswith(text)]
+    # print(f"{matches=} {state=}")
     base = completion.get_common_base(text, matches)
     if state == 0:
         if len(matches) == 1:
             has_printed_bell = False
             return f"{matches[0]} "
-        elif base:
+        elif base and base != text:
+            # there's a base and it has introduced a change
             has_printed_bell = False
             return f"{base}"
         elif len(matches) > 1:
@@ -93,6 +95,7 @@ def completer_func(text, state):
             else:
                 print("  ".join(matches))
                 print(f"$ {text}", end="")
+                has_printed_bell = False
     return None
 
 
