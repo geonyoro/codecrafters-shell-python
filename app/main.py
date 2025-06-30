@@ -1,4 +1,3 @@
-import logging
 import os
 import readline
 import subprocess
@@ -19,8 +18,6 @@ RUN_FUNC = typing.Callable[
     ],  # cmd
     None,
 ]
-
-LOGGER = logging.getLogger(__name__)
 
 progs: dict[str, RUN_FUNC] = {
     "exit": lambda cmd, *args, **kwargs: sys.exit(int(cmd[1])),
