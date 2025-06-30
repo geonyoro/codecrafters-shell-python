@@ -74,16 +74,18 @@ has_printed_bell = False
 
 
 def completer_func(text, state):
+    global has_printed_bell
     source_list = sorted(set(list(progs.keys()) + list(get_path_prog_names())))
     matches = [i for i in source_list if i.startswith(text)]
     base = completion.get_common_base(text, matches)
     if state == 0:
         if len(matches) == 1:
+            has_printed_bell = False
             return f"{matches[0]} "
         elif base:
+            has_printed_bell = False
             return f"{base}"
         elif len(matches) > 1:
-            global has_printed_bell
             if not has_printed_bell:
                 has_printed_bell = True
                 sys.stdout.write("\a")
@@ -138,4 +140,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
