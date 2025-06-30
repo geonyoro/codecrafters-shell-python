@@ -3,7 +3,7 @@ import typing
 
 
 def cmd_type(args: list[str], environs: dict[str, typing.Any], stdout, stderr):
-    paths = environs.get("PATH", "").split(":")
+    paths = sorted(environs.get("PATH", "").split(":"))
     for prog_name in args[1:]:
         prog_name = prog_name.strip()
         if prog_name in environs.get("known_commands", []):

@@ -1,4 +1,4 @@
-import io
+import logging
 import os
 import readline
 import subprocess
@@ -7,18 +7,20 @@ import typing
 from functools import lru_cache
 from os.path import isfile
 
-from app import commands, parsers, completion
+from app import commands, completion, parsers
 
 RUN_FUNC = typing.Callable[
     # args
     [
         list[str],  # cmd
         dict[str, typing.Any],  # environ
-        io.FileIO,  # stdout
-        io.FileIO,  # stderr
+        typing.Any,  # stdout
+        typing.Any,  # stderr
     ],  # cmd
     None,
 ]
+
+LOGGER = logging.getLogger(__name__)
 
 progs: dict[str, RUN_FUNC] = {
     "exit": lambda cmd, *args, **kwargs: sys.exit(int(cmd[1])),
