@@ -138,7 +138,8 @@ def main():
                     stderr=stderr,
                     # env=environ,
                 )
-                p.wait()
+                if is_last_run:
+                    p.wait()
                 stdin = p.stdout
             except FileNotFoundError:
                 print(f"{args[0]}: command not found")
