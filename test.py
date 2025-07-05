@@ -64,7 +64,6 @@ out:['echo', 'mixed"quote\'world\'\\']
 """
         ins, outs = parse_ins_and_outs(test_cases)
         for input, raw_out in zip(ins, outs):
-            print(input)
             output = eval(raw_out)
             pout = parsers.parser(input)
             self.assertEqual(output, pout)
@@ -119,3 +118,7 @@ out:(("echo "),("hello","w"),("goodbye","w"))
 
         with self.subTest("full completion"):
             self.assertEqual("xyz_foo_bar_baz", get_common_base("xyz_foo_bar_b", progs))
+
+    def test_parse_multi_cmd(self):
+        cmds = parsers.parse_multi_cmd("cat /tmp/x | wc")
+        self.assertEqual(cmds, ["cat /tmp/x", "wc"])

@@ -1,3 +1,6 @@
+import subprocess
+
+
 def parser(input: str) -> list[str]:
     cmds = []
     ix = 0
@@ -178,6 +181,15 @@ def split_on_redirects(
             hit_redirect = None
         else:
             ix += 1
-            print(inpt[ix:])
 
     return cmd, stdout, stderr
+
+
+def parse_multi_cmd(multi_cmd) -> list[str]:
+    cmds = []
+    for cmd in multi_cmd.split("|"):
+        cmd = cmd.strip()
+        if not cmd:
+            continue
+        cmds.append(cmd)
+    return cmds

@@ -104,40 +104,52 @@ def main():
     while True:
         sys.stdout.write("$ ")
         # Wait for user input
-        cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(input())
-        if stdout_fname:
-            stdout = open(stdout_fname[0], mode=stdout_fname[1])
-        else:
-            stdout = sys.stdout
-
+        multi_cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(input())
         if stderr_fname:
             stderr = open(stderr_fname[0], mode=stderr_fname[1])
         else:
             stderr = sys.stderr
 
-        args = parsers.parser(cmd)
-        prog = args[0]
-        run_func = progs.get(prog)
-        if run_func:
-            run_func(args, environ, stdout, stderr)
-            continue
+        cmds = parsers.parse_multi_cmd(multi_cmd)
+        last_index = len(cmds) - 1
+        stdin = None
+        for index, cmd in enumerate(cmds):
+            is_last_run = index == last_index
+            if is_last_run:
+                if stdout_fname:
+                    stdout = open(stdout_fname[0], mode=stdout_fname[1])
+                else:
+                    stdout = sys.stdout
+            else:
+                stdout = subprocess.PIPE
 
-        try:
-            p = subprocess.run(
-                args,
-                stdout=stdout,
-                stderr=stderr,
-                # env=environ,
-            )
-        except FileNotFoundError:
-            print(f"{args[0]}: command not found")
-        else:
-            err = p.stderr
-            out = p.stdout
-            if err:
-                print(err.decode().strip())
-            elif out:
-                print(out.decode().strip())
+            args = parsers.parser(cmd)
+            prog = args[0]
+            run_func = progs.get(prog)
+            if run_func:
+                run_func(args, environ, stdout, stderr)
+                continue
+
+            try:
+                p = subprocess.Popen(
+                    args,
+                    stdin=stdin,
+                    stdout=stdout,
+                    stderr=stderr,
+                    # env=environ,
+                )
+                p.wait()
+                stdin = p.stdout
+            except FileNotFoundError:
+                print(f"{args[0]}: command not found")
+            else:
+                if is_last_run:
+                    for entry in (p.stderr, p.stdout):
+                        if entry:
+                            output = entry.read()
+                            print(output, repr(output))
+
+        # sys.stdout.write("\n")
 
 
 if __name__ == "__main__":
