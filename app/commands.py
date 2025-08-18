@@ -36,9 +36,7 @@ def cmd_pwd(args: list[str], stdout, stderr):
 def cmd_cd(args: list[str], environs: dict[str, typing.Any], stdout, stderr):
     new_path = args[1]
     if new_path == "~":
-        pass
-    else:
-        pass
+        new_path = os.environ["HOME"]
 
         # parts = new_path.split("/")
     try:
