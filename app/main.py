@@ -113,6 +113,7 @@ def main():
         raw_cmd = input()
         history.append(raw_cmd)
         multi_cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(raw_cmd)
+        stdout = None
         stderr = pipelines.get_stderr(stderr_fname=stderr_fname)
 
         cmds = parsers.parse_multi_cmd(multi_cmd)
@@ -169,6 +170,8 @@ def main():
                 subprocess.call(args, stdin=stdin, stdout=stdout, stderr=stderr)
             if in_child:
                 return
+        pipelines.close_fds(stdout_fname, stdout)
+        pipelines.close_fds(stderr_fname, stderr)
 
 
 if __name__ == "__main__":

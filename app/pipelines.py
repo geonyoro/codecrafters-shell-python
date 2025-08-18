@@ -61,3 +61,11 @@ def get_stdout(stdout_fname: tuple[str, str] | None) -> IO:
         return open(stdout_fname[0], mode=stdout_fname[1])
     else:
         return sys.stdout
+
+
+def close_fds(fname: tuple[str, str] | None, io: IO | None):
+    if not fname:
+        return
+    # we were using a custom stdout/stderr if fname
+    if io:
+        io.close()
