@@ -61,5 +61,11 @@ def cmd_cd(ca: CmdArgs):
 
 
 def cmd_history(ca: CmdArgs):
-    for ix, row in enumerate(ca.extra_args["history"], start=1):
-        print(f"{ix} {row}")
+    hist = ca.extra_args["history"]
+    start = 1
+    if len(ca.args) > 1:
+        size = int(ca.args[1])
+        start = len(hist) - size
+        hist = hist[start:]
+    for ix, row in enumerate(hist):
+        print(f"{start + ix} {row}")
