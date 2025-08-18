@@ -1,6 +1,6 @@
 import unittest
 
-from app import parsers
+from app import parsers, pipelines
 from app.completion import get_common_base
 
 # line 1 is the input, line 2 is the output
@@ -122,3 +122,23 @@ out:(("echo "),("hello","w"),("goodbye","w"))
     def test_parse_multi_cmd(self):
         cmds = parsers.parse_multi_cmd("cat /tmp/x | wc")
         self.assertEqual(cmds, ["cat /tmp/x", "wc"])
+
+    def test_setup_pipeline(self):
+        cmds = ["cat /tmp/x", "head -n2", "wc -l"]
+        p = pipelines.setup_pipeline(cmds)
+        # there are 3 elements
+        self.assertEqual(len(p), 3)
+
+        # commands match up
+        self.assertEqual(p[0].command, "cat /tmp/x")
+        self.assertEqual(p[1].command, "head -n2")
+        self.assertEqual(p[2].command, "wc -l")
+
+        # first input and last output are none
+        self.assertIsNone(p[0].stdin_pipe)
+        self.assertIsNone(p[2].stdout_pipe)
+
+        # the redirects are setup properly, output of each stage being input to
+        # the next stage
+        self.assertEqual(p[0].stdout_pipe, p[1].stdin_pipe, "output of 0 is input to 1")
+        self.assertEqual(p[1].stdout_pipe, p[2].stdin_pipe, "output of 1 is input to 2")

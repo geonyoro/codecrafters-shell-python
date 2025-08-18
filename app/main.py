@@ -6,7 +6,7 @@ import typing
 from functools import lru_cache
 from os.path import isfile
 
-from app import commands, completion, parsers
+from app import commands, completion, parsers, pipelines
 
 RUN_FUNC = typing.Callable[
     # args
@@ -101,9 +101,12 @@ def completer_func(text, state):
 def main():
     readline.parse_and_bind("tab: complete")
     readline.set_completer(completer_func)
+    # clone original input
+    orig_stdin = os.dup(0)
     while True:
+        os.dup2(orig_stdin, 0)
         sys.stdout.write("$ ")
-        # Wait for user input
+        # Wait for user input, multi_cmd is a parent command with pipes and everything
         multi_cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(input())
         if stderr_fname:
             stderr = open(stderr_fname[0], mode=stderr_fname[1])
@@ -112,45 +115,51 @@ def main():
 
         cmds = parsers.parse_multi_cmd(multi_cmd)
         last_index = len(cmds) - 1
-        stdin = None
-        for index, cmd in enumerate(cmds):
-            is_last_run = index == last_index
-            if is_last_run:
+        pcmds = pipelines.setup_pipeline(cmds)
+        for index, pcmd in enumerate(pcmds):
+            is_last_index = index == last_index
+            in_child = False
+            if is_last_index:
+                # final command should be run in the same process as the parent
+                # hence no forking
                 if stdout_fname:
                     stdout = open(stdout_fname[0], mode=stdout_fname[1])
                 else:
                     stdout = sys.stdout
             else:
-                stdout = subprocess.PIPE
+                pid = os.fork()
+                in_child = pid == 0
+                assert (
+                    pcmd.fd_stdout
+                )  # this must exist since this is a command earlier in the pipeline
+                stdout = open(pcmd.fd_stdout, "w")
+                if not in_child:
+                    # parent continues next round to fork another set
+                    continue
+                # in child, will be reading from stdin.r and writing to stdout.w
+                # close others
+                if pcmd.stdin_pipe:
+                    os.close(pcmd.stdin_pipe.w)
+                if pcmd.stdout_pipe:
+                    os.close(pcmd.stdout_pipe.r)
 
-            args = parsers.parser(cmd)
+            # only children, or last_index parent can run here
+            if not in_child:
+                assert is_last_index
+
+            args = parsers.parser(pcmd.command)
             prog = args[0]
             run_func = progs.get(prog)
             if run_func:
                 run_func(args, environ, stdout, stderr)
-                continue
-
-            try:
-                p = subprocess.Popen(
-                    args,
-                    stdin=stdin,
-                    stdout=stdout,
-                    stderr=stderr,
-                    # env=environ,
-                )
-                if is_last_run:
-                    p.wait()
-                stdin = p.stdout
-            except FileNotFoundError:
-                print(f"{args[0]}: command not found")
             else:
-                if is_last_run:
-                    for entry in (p.stderr, p.stdout):
-                        if entry:
-                            output = entry.read()
-                            print(output, repr(output))
-
-        # sys.stdout.write("\n")
+                if pcmd.fd_stdin:
+                    stdin = open(pcmd.fd_stdin)
+                else:
+                    stdin = None
+                subprocess.call(args, stdin=stdin, stdout=stdout)
+            if in_child:
+                return
 
 
 if __name__ == "__main__":
