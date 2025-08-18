@@ -24,6 +24,7 @@ progs: dict[str, RUN_FUNC] = {
     "exit": lambda cmd, *args, **kwargs: sys.exit(int(cmd[1])),
     "echo": lambda args, _, stdout, stderr: commands.cmd_echo(args[1:], stdout, stderr),
     "type": commands.cmd_type,
+    "pwd": lambda args, _, stdout, stderr: commands.cmd_pwd(args[1:], stdout, stderr),
 }
 
 known_commands = list(progs.keys())

@@ -27,3 +27,7 @@ def cmd_type(args: list[str], environs: dict[str, typing.Any], stdout, stderr):
 def cmd_echo(args: list[str], stdout, stderr):
     stdout.write(" ".join(args))
     stdout.write("\n")
+
+
+def cmd_pwd(args: list[str], stdout, stderr):
+    stdout.write(f"{os.getcwd()}\n")
