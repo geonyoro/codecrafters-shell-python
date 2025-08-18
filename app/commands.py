@@ -31,3 +31,17 @@ def cmd_echo(args: list[str], stdout, stderr):
 
 def cmd_pwd(args: list[str], stdout, stderr):
     stdout.write(f"{os.getcwd()}\n")
+
+
+def cmd_cd(args: list[str], environs: dict[str, typing.Any], stdout, stderr):
+    new_path = args[1]
+    if new_path == "~":
+        pass
+    else:
+        pass
+
+        # parts = new_path.split("/")
+    try:
+        os.chdir(new_path)
+    except FileNotFoundError:
+        print(f"cd: {new_path}: No such file or directory")
