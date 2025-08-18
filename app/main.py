@@ -11,26 +11,21 @@ from app import commands, completion, parsers, pipelines
 
 RUN_FUNC = typing.Callable[
     # args
-    [
-        list[str],  # cmd
-        dict[str, typing.Any],  # environ
-        typing.Any,  # stdout
-        typing.Any,  # stderr
-    ],  # cmd
+    [commands.CmdArgs],  # cmd
     None,
 ]
 
 progs: dict[str, RUN_FUNC] = {
-    "exit": lambda cmd, *args, **kwargs: sys.exit(int(cmd[1])),
-    "echo": lambda args, _, stdout, stderr: commands.cmd_echo(args[1:], stdout, stderr),
+    "exit": commands.cmd_exit,
+    "echo": commands.cmd_echo,
     "type": commands.cmd_type,
-    "pwd": lambda args, _, stdout, stderr: commands.cmd_pwd(args[1:], stdout, stderr),
+    "pwd": commands.cmd_pwd,
     "cd": commands.cmd_cd,
 }
 
 known_commands = list(progs.keys())
 
-environ = {
+custom_environ = {
     "known_commands": known_commands,
     "PATH": os.getenv("PATH", ""),
 }
@@ -148,7 +143,10 @@ def main():
             prog = args[0]
             run_func = progs.get(prog)
             if run_func:
-                run_func(args, environ, stdout, stderr)
+                cmd_args = commands.CmdArgs(
+                    args=args, environs=custom_environ, stdout=stdout, stderr=stderr
+                )
+                run_func(cmd_args)
             elif not shutil.which(prog):
                 stdout.write(f"{prog}: not found\n")
                 continue

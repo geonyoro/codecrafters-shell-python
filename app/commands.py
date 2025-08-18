@@ -1,13 +1,29 @@
 import os
+import sys
 import typing
+from dataclasses import dataclass
+
+history = []
 
 
-def cmd_type(args: list[str], environs: dict[str, typing.Any], stdout, stderr):
-    paths = environs.get("PATH", "").split(":")
-    for prog_name in args[1:]:
+@dataclass
+class CmdArgs:
+    args: list[str]
+    environs: dict[str, typing.Any]
+    stdout: typing.IO
+    stderr: typing.IO
+
+
+def cmd_exit(ca: CmdArgs):
+    sys.exit(int(ca.args[1]))
+
+
+def cmd_type(ca: CmdArgs):
+    paths = ca.environs.get("PATH", "").split(":")
+    for prog_name in ca.args[1:]:
         prog_name = prog_name.strip()
-        if prog_name in environs.get("known_commands", []):
-            stdout.write(f"{prog_name} is a shell builtin\n")
+        if prog_name in ca.environs.get("known_commands", []):
+            ca.stdout.write(f"{prog_name} is a shell builtin\n")
             return
 
         for path in paths:
@@ -18,22 +34,34 @@ def cmd_type(args: list[str], environs: dict[str, typing.Any], stdout, stderr):
                     fullpath = os.path.join(path, name)
                     if not os.access(fullpath, os.X_OK):
                         continue
-                    stdout.write(f"{prog_name} is {fullpath}\n")
+                    ca.stdout.write(f"{prog_name} is {fullpath}\n")
                     return
 
-        stdout.write(f"{prog_name}: not found\n")
+        ca.stdout.write(f"{prog_name}: not found\n")
 
 
-def cmd_echo(args: list[str], stdout, stderr):
-    stdout.write(" ".join(args))
-    stdout.write("\n")
+def cmd_echo(ca: CmdArgs):
+    ca.stdout.write(" ".join(ca.args[1:]))
+    ca.stdout.write("\n")
 
 
-def cmd_pwd(args: list[str], stdout, stderr):
-    stdout.write(f"{os.getcwd()}\n")
+def cmd_pwd(ca: CmdArgs):
+    ca.stdout.write(f"{os.getcwd()}\n")
 
 
-def cmd_cd(args: list[str], environs: dict[str, typing.Any], stdout, stderr):
+def cmd_cd(ca: CmdArgs):
+    new_path = ca.args[1]
+    if new_path == "~":
+        new_path = os.environ["HOME"]
+
+        # parts = new_path.split("/")
+    try:
+        os.chdir(new_path)
+    except FileNotFoundError:
+        ca.stdout.write(f"cd: {new_path}: No such file or directory\n")
+
+
+def cmd_history(args: list[str], ca: CmdArgs):
     new_path = args[1]
     if new_path == "~":
         new_path = os.environ["HOME"]
@@ -42,4 +70,4 @@ def cmd_cd(args: list[str], environs: dict[str, typing.Any], stdout, stderr):
     try:
         os.chdir(new_path)
     except FileNotFoundError:
-        print(f"cd: {new_path}: No such file or directory")
+        ca.stdout.write(f"cd: {new_path}: No such file or directory\n")
