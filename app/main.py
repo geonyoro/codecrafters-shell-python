@@ -21,6 +21,7 @@ progs: dict[str, RUN_FUNC] = {
     "type": commands.cmd_type,
     "pwd": commands.cmd_pwd,
     "cd": commands.cmd_cd,
+    "history": commands.cmd_history,
 }
 
 known_commands = list(progs.keys())
@@ -29,6 +30,10 @@ custom_environ = {
     "known_commands": known_commands,
     "PATH": os.getenv("PATH", ""),
 }
+
+
+history = []
+extra_args = {"history": history}
 
 
 @lru_cache
@@ -105,7 +110,9 @@ def main():
         os.dup2(orig_stdin, 0)
         sys.stdout.write("$ ")
         # Wait for user input, multi_cmd is a parent command with pipes and everything
-        multi_cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(input())
+        raw_cmd = input()
+        history.append(raw_cmd)
+        multi_cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(raw_cmd)
         stderr = pipelines.get_stderr(stderr_fname=stderr_fname)
 
         cmds = parsers.parse_multi_cmd(multi_cmd)
@@ -144,7 +151,11 @@ def main():
             run_func = progs.get(prog)
             if run_func:
                 cmd_args = commands.CmdArgs(
-                    args=args, environs=custom_environ, stdout=stdout, stderr=stderr
+                    args=args,
+                    environs=custom_environ,
+                    stdout=stdout,
+                    stderr=stderr,
+                    extra_args=extra_args,
                 )
                 run_func(cmd_args)
             elif not shutil.which(prog):

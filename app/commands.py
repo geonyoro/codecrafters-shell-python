@@ -3,8 +3,6 @@ import sys
 import typing
 from dataclasses import dataclass
 
-history = []
-
 
 @dataclass
 class CmdArgs:
@@ -12,6 +10,7 @@ class CmdArgs:
     environs: dict[str, typing.Any]
     stdout: typing.IO
     stderr: typing.IO
+    extra_args: dict[str, typing.Any]
 
 
 def cmd_exit(ca: CmdArgs):
@@ -61,13 +60,6 @@ def cmd_cd(ca: CmdArgs):
         ca.stdout.write(f"cd: {new_path}: No such file or directory\n")
 
 
-def cmd_history(args: list[str], ca: CmdArgs):
-    new_path = args[1]
-    if new_path == "~":
-        new_path = os.environ["HOME"]
-
-        # parts = new_path.split("/")
-    try:
-        os.chdir(new_path)
-    except FileNotFoundError:
-        ca.stdout.write(f"cd: {new_path}: No such file or directory\n")
+def cmd_history(ca: CmdArgs):
+    for ix, row in enumerate(ca.extra_args["history"], start=1):
+        print(f"{ix} {row}")
