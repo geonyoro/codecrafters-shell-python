@@ -157,7 +157,7 @@ def main():
                     stdin = open(pcmd.fd_stdin)
                 else:
                     stdin = None
-                subprocess.call(args, stdin=stdin, stdout=stdout)
+                subprocess.call(args, stdin=stdin, stdout=stdout, stderr=sys.stderr)
             if in_child:
                 return
 
