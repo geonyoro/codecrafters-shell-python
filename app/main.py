@@ -1,5 +1,6 @@
 import os
 import readline
+import shutil
 import subprocess
 import sys
 import typing
@@ -152,6 +153,9 @@ def main():
             run_func = progs.get(prog)
             if run_func:
                 run_func(args, environ, stdout, stderr)
+            elif not shutil.which(prog):
+                stdout.write(f"{prog}: not found\n")
+                continue
             else:
                 if pcmd.fd_stdin:
                     stdin = open(pcmd.fd_stdin)
