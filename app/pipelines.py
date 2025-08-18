@@ -1,5 +1,7 @@
 import os
+import sys
 from dataclasses import dataclass
+from typing import IO
 
 
 @dataclass
@@ -45,3 +47,17 @@ def setup_pipeline(cmds: list[str]) -> list[Command]:
             previous_pipe = pipe
 
     return p
+
+
+def get_stderr(stderr_fname: tuple[str, str] | None) -> IO:
+    if stderr_fname:
+        return open(stderr_fname[0], mode=stderr_fname[1])
+    else:
+        return sys.stderr
+
+
+def get_stdout(stdout_fname: tuple[str, str] | None) -> IO:
+    if stdout_fname:
+        return open(stdout_fname[0], mode=stdout_fname[1])
+    else:
+        return sys.stdout

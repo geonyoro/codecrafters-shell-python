@@ -109,9 +109,7 @@ def main():
         sys.stdout.write("$ ")
         # Wait for user input, multi_cmd is a parent command with pipes and everything
         multi_cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(input())
-        stderr = (
-            open(stderr_fname[0], mode=stderr_fname[1]) if stderr_fname else sys.stderr
-        )
+        stderr = pipelines.get_stderr(stderr_fname=stderr_fname)
 
         cmds = parsers.parse_multi_cmd(multi_cmd)
         last_index = len(cmds) - 1
@@ -122,12 +120,7 @@ def main():
             if is_last_index:
                 # final command should be run in the same process as the parent
                 # hence no forking
-                stdout = (
-                    open(stdout_fname[0], mode=stdout_fname[1])
-                    if stdout_fname
-                    else sys.stdout
-                )
-
+                stdout = pipelines.get_stdout(stdout_fname=stdout_fname)
             else:
                 pid = os.fork()
                 in_child = pid == 0
@@ -140,12 +133,12 @@ def main():
                     continue
                 # in child, will be reading from stdin.r and writing to stdout.w
                 # close others
-                if pcmd.stdin_pipe:
-                    os.close(pcmd.stdin_pipe.w)
-                if pcmd.stdout_pipe:
-                    os.close(pcmd.stdout_pipe.r)
+                # if pcmd.stdin_pipe:
+                #     os.close(pcmd.stdin_pipe.w)
+                # if pcmd.stdout_pipe:
+                #     os.close(pcmd.stdout_pipe.r)
 
-            # we can only be in a child, or last_index parent
+            # only children, or last_index parent can run here
             if not in_child:
                 assert is_last_index
 
