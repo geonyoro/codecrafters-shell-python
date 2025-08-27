@@ -80,6 +80,13 @@ def cmd_history(ca: CmdArgs):
                     wfile.write(line + "\n")
             return
 
+        if ca.args[1] == "-a":
+            filename = ca.args[2]
+            with open(filename, "a") as wfile:
+                for line in hist:
+                    wfile.write(line + "\n")
+            return
+
         # it must be the integer showing how much of history to show
         size = int(ca.args[1])
         start = len(hist) - size
