@@ -64,8 +64,20 @@ def cmd_history(ca: CmdArgs):
     hist = ca.extra_args["history"]
     start = 1
     if len(ca.args) > 1:
+        if ca.args[1] == "-r":
+            filename = ca.args[2]
+            with open(filename) as wfile:
+                for line in wfile.readlines():
+                    line = line.strip()
+                    if not line:
+                        continue
+                    hist.append(line)
+            return
+
+        # it must be the integer showing how much of history to show
         size = int(ca.args[1])
         start = len(hist) - size
         hist = hist[start:]
+
     for ix, row in enumerate(hist):
         print(f"{start + ix} {row}")
