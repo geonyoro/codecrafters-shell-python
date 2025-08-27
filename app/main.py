@@ -102,15 +102,35 @@ def completer_func(text, state):
 
 
 def main():
-    readline.parse_and_bind("tab: complete")
+    readline.parse_and_bind("TAB: complete")
+    readline.parse_and_bind(r'#"\M-OA\': previous-history')
+    readline.parse_and_bind(r'#"\M-OB\': next-history')
+    readline.parse_and_bind(r'#"\M-[A\': previous-history')
+    readline.parse_and_bind(r'#"\M-[B\': next-history')
+    readline.parse_and_bind(r'#"\M-\C-OA\': previous-history')
+    readline.parse_and_bind(r'#"\M-\C-OB\': next-history')
+    readline.parse_and_bind(r'#"\M-\C-[A\': previous-history')
+    readline.parse_and_bind(r'#"\M-\C-[B\': next-history')
     readline.set_completer(completer_func)
     # clone original input
     orig_stdin = os.dup(0)
     while True:
         os.dup2(orig_stdin, 0)
         sys.stdout.write("$ ")
+
+        readline.clear_history()
+        hist_size = len(history)
+        for hist_idx, hist_entry in enumerate(history):
+            entry = hist_entry
+            if hist_idx < hist_size - 1:
+                entry = f"$ {entry}"
+            readline.add_history(entry)
+
         # Wait for user input, multi_cmd is a parent command with pipes and everything
-        raw_cmd = input()
+        raw_cmd = input().strip()
+        if not raw_cmd:
+            sys.stdout.write("\n")
+            continue
         history.append(raw_cmd)
         multi_cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(raw_cmd)
         stdout = None
