@@ -116,18 +116,9 @@ def main():
     orig_stdin = os.dup(0)
     while True:
         os.dup2(orig_stdin, 0)
-        sys.stdout.write("$ ")
-
-        readline.clear_history()
-        hist_size = len(history)
-        for hist_idx, hist_entry in enumerate(history):
-            entry = hist_entry
-            if hist_idx < hist_size - 1:
-                entry = f"$ {entry}"
-            readline.add_history(entry)
 
         # Wait for user input, multi_cmd is a parent command with pipes and everything
-        raw_cmd = input().strip()
+        raw_cmd = input("$ ").strip()
         if not raw_cmd:
             sys.stdout.write("\n")
             continue
