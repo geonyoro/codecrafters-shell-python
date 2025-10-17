@@ -82,9 +82,11 @@ def cmd_history(ca: CmdArgs):
 
         if ca.args[1] == "-a":
             filename = ca.args[2]
+            start_idx = ca.extra_args["history_a_index"]
             with open(filename, "a") as wfile:
-                for line in hist:
+                for line in hist[start_idx:]:
                     wfile.write(line + "\n")
+            ca.extra_args["history_a_index"] = len(hist)
             return
 
         # it must be the integer showing how much of history to show

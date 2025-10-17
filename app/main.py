@@ -33,7 +33,7 @@ custom_environ = {
 
 
 history = []
-extra_args = {"history": history}
+extra_args = {"history": history, "history_a_index": 0}
 
 
 @lru_cache
