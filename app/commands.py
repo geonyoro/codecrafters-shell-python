@@ -3,6 +3,7 @@ import sys
 import typing
 from dataclasses import dataclass
 
+from . import history
 
 @dataclass
 class CmdArgs:
@@ -66,12 +67,7 @@ def cmd_history(ca: CmdArgs):
     if len(ca.args) > 1:
         if ca.args[1] == "-r":
             filename = ca.args[2]
-            with open(filename) as wfile:
-                for line in wfile.readlines():
-                    line = line.strip()
-                    if not line:
-                        continue
-                    hist.append(line)
+            history.load_history_from_file(filename, hist)
             return
         if ca.args[1] == "-w":
             filename = ca.args[2]

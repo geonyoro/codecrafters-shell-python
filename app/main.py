@@ -7,7 +7,7 @@ import typing
 from functools import lru_cache
 from os.path import isfile
 
-from app import commands, completion, parsers, pipelines
+from app import commands, completion, parsers, pipelines, history
 
 RUN_FUNC = typing.Callable[
     # args
@@ -32,8 +32,8 @@ custom_environ = {
 }
 
 
-history = []
-extra_args = {"history": history, "history_a_index": 0}
+history_list = []
+extra_args = {"history": history_list, "history_a_index": 0}
 
 
 @lru_cache
@@ -101,7 +101,15 @@ def completer_func(text, state):
     return None
 
 
+def load_history():
+    histfile = os.environ.get("HISTFILE")
+    if not histfile or not os.path.exists(histfile):
+        return
+    history.load_history_from_file(histfile, history_list)
+
+
 def main():
+    load_history()
     readline.parse_and_bind("TAB: complete")
     readline.parse_and_bind(r'#"\M-OA\': previous-history')
     readline.parse_and_bind(r'#"\M-OB\': next-history')
@@ -122,7 +130,7 @@ def main():
         if not raw_cmd:
             sys.stdout.write("\n")
             continue
-        history.append(raw_cmd)
+        history_list.append(raw_cmd)
         multi_cmd, stdout_fname, stderr_fname = parsers.split_on_redirects(raw_cmd)
         stdout = None
         stderr = pipelines.get_stderr(stderr_fname=stderr_fname)
