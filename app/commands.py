@@ -17,7 +17,7 @@ class CmdArgs:
 
 def cmd_exit(ca: CmdArgs):
     hist = ca.extra_args["history"]
-    history.write_history_to_file(os.environ["HISTFILE"], hist)
+    history.write_history_to_file(os.environ.get("HISTFILE"), hist)
     sys.exit(int(ca.args[1]))
 
 
