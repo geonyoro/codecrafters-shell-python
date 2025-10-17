@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from . import history
 
+
 @dataclass
 class CmdArgs:
     args: list[str]
@@ -15,6 +16,8 @@ class CmdArgs:
 
 
 def cmd_exit(ca: CmdArgs):
+    hist = ca.extra_args["history"]
+    history.write_history_to_file(os.environ["HISTFILE"], hist)
     sys.exit(int(ca.args[1]))
 
 
@@ -71,9 +74,7 @@ def cmd_history(ca: CmdArgs):
             return
         if ca.args[1] == "-w":
             filename = ca.args[2]
-            with open(filename, "w") as wfile:
-                for line in hist:
-                    wfile.write(line + "\n")
+            history.write_history_to_file(filename, hist)
             return
 
         if ca.args[1] == "-a":
